@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informations des Parties de Jeux</title>
+
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+
+
+    <div id="partie-info">
+        </div>
+            <div id="player-stats">
+        </div>
+ 
+    <form id="form-partie">
+       
+        <label for="nomPartie">Id Niveau:</label>
+        <input type="text" id="idNiveau" name="idNiveau" required>   
+        <button type="submit">Construire</button>
+    </form>
+        <button id="Somme">Somme</button>
+
+  <div id="niveauNonbati"> </div>
+    <div id="afficherSomme"> </div>v
+    <script>
+        const socket = io();
+
+        document.getElementById('form-partie').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const _id = document.getElementById('idNiveau').value;
+        
+            const niveau = {
+                _id,
+                     
+            };
+
+            socket.emit('construction', niveau);
+        });
+
+      document.getElementById('Somme').addEventListener('click', (e) => {
+            e.preventDefault();
+
+           
+      socket.emit('afficherSomme');
+    });
+         socket.on('somme', (somme) => {
+            const partieInfoContainer = document.getElementById('afficherSomme');
+            const partieDiv = document.createElement('div');
+            partieDiv.innerHTML = `
+             
+           
+                <p>la somme est: ${somme}</p>
+                
+              
+            `;
+            partieInfoContainer.appendChild(partieDiv);
+        });
+
+
+  socket.on('getNiveauNonBati', (niveauNonBati) => {
+  const playerStatsContainer = document.getElementById('niveauNonbati');
+  
+  // Clear previous content
+  playerStatsContainer.innerHTML = '';
+
+  // Map over each non-built level and create HTML for display
+  niveauNonBati.forEach((niveau) => {
+    const niveauElement = document.createElement('div');
+    niveauElement.innerHTML = `
+      <p>nom: ${niveau.nom}</p>
+      <p>nbrchambre: ${niveau.nbrChambre}</p>
+      <p>etatConstruction: ${niveau.etatConstruction}</p>
+      <p>idBatiment: ${niveau.idBatiment}</p>
+    `;
+    playerStatsContainer.appendChild(niveauElement);
+  });
+});
+
+
+    </script>
+</body>
+</html>
